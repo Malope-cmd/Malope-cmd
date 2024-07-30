@@ -1,0 +1,62 @@
+import numpy as np #Maths and stats
+import matplotlib.pyplot as plt #plotting
+import pandas as pd #Dataframing
+
+from scipy.stats import pearsonr #Corellation coefficients
+from sklearn.linear_model import LinearRegression #Linear regression
+
+n= 150 # sample size
+main_var = 3.6
+noise_var= 3.3
+scale_factor = 2.4
+
+
+random_numbers = np.random.normal(100, main_var, n)
+random_numbers.sort()
+
+
+bin_edges = np.arange(0, max(random_numbers) + 6, 5)
+plt.hist(random_numbers, bins=bin_edges, edgecolor='black')
+plt.show()
+
+#plt.plot(random_numbers)
+#plt.xlabel("Numbers")
+#plt.ylabel("Frequency")
+#plt.title("Frequency Plot")
+#plt.show()
+
+def mult_arr(array, factor):
+    return array * factor
+
+rand_nums = mult_arr(random_numbers, scale_factor)
+rand_nums.sort()
+
+#print(rand_nums)
+
+data = {"Covariate 1": random_numbers, "Covariate 2": rand_nums+ np.random.normal(0, noise_var ,n)}
+dataf = pd.DataFrame(data)
+
+#plt.scatter(dataf["Covariate 1"], dataf["Covariate 2"], c="red")
+#plt.xlabel("Covariate 1")
+#plt.ylabel("Covariate 2")
+#plt.title("Scatter Plot")
+
+#print(pearsonr(dataf["Covariate 1"], dataf["Covariate 2"]))
+
+modA = LinearRegression()
+modA.fit(dataf[["Covariate 1"]], dataf["Covariate 2"])
+print("Intercept:", modA.intercept_)
+print("Coeficient", modA.coef_)
+
+covA_range = np.linspace(min(dataf["Covariate 1"]), max(dataf["Covariate 1"]), n)
+#print(covA_range)
+predA = modA.predict(covA_range.reshape(-1,1))
+#print(predA)
+
+plt.scatter(dataf["Covariate 1"], dataf["Covariate 2"], c="red")
+plt.plot(covA_range, predA, color="blue")
+plt.xlabel("Covariate 1")
+plt.ylabel("Covariate 2")
+plt.title("Scatter Plot with SLR model")
+plt.show()
+
